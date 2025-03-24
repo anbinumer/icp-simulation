@@ -1,4 +1,4 @@
-// Full game implementation (TypeScript-safe)
+// Full game implementation (with logic + UI/UX polish)
 import React, { useState } from 'react';
 import { Brain, PhoneCall } from 'lucide-react';
 import { scenarios } from './data/scenarios';
@@ -49,6 +49,49 @@ const ICPSimulationGame = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [playerName, setPlayerName] = useState("");
 
+  const makeDecision = (optionIndex: number) => {
+    const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
+    const outcome = determineOutcome(gameState.currentScenarioIndex, optionIndex);
+    const updatedVitals = updateVitalsBasedOnOutcome(gameState, outcome);
+
+    const updatedScore = outcome.correct ? gameState.score + 100 : gameState.score;
+    const updatedBonus = outcome.correct && decisionTime < 5000 ? gameState.bonusPoints + 50 : gameState.bonusPoints;
+
+    const isLastScenario = gameState.currentScenarioIndex === scenarios.length - 1;
+
+    setGameState({
+      ...gameState,
+      ...updatedVitals,
+      currentScenarioIndex: isLastScenario ? gameState.currentScenarioIndex : gameState.currentScenarioIndex + 1,
+      decisions: [...gameState.decisions, optionIndex],
+      decisionTimes: [...gameState.decisionTimes, decisionTime],
+      lastDecision: optionIndex,
+      score: updatedScore,
+      bonusPoints: updatedBonus,
+      gameOver: isLastScenario,
+      outcome: isLastScenario ? determineOutcome(gameState.currentScenarioIndex, optionIndex) : null
+    });
+  };
+
+  const callDoctor = () => {
+    if (gameState.doctorCallsRemaining > 0) {
+      setGameState({
+        ...gameState,
+        doctorCallsRemaining: gameState.doctorCallsRemaining - 1,
+        showDoctorAdvice: true,
+        doctorAdvice: scenarios[gameState.currentScenarioIndex].doctorAdvice
+      });
+    }
+  };
+
+  const continueToNextScenario = () => {
+    setGameState({
+      ...gameState,
+      showDoctorAdvice: false,
+      doctorAdvice: ""
+    });
+  };
+
   const restartGame = () => {
     setGameState({
       ...gameState,
@@ -77,18 +120,18 @@ const ICPSimulationGame = () => {
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto p-4 space-y-6">
       <div className="flex items-center space-x-2">
-        <Brain className="h-8 w-8 text-blue-600" />
+        <Brain className="h-8 w-8 text-blue-600 animate-pulse" />
         <h1 className="text-2xl font-bold text-blue-600">ICP Management Simulation: Sarah Chen's Case</h1>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b pb-2">
         <div className="flex items-center space-x-2">
           <PhoneCall className="h-5 w-5 text-blue-600" />
           <span className="text-sm font-medium">Doctor Calls Remaining: {gameState.doctorCallsRemaining}</span>
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-sm font-medium mr-2">Patient Status:</span>
-          <span className={`inline-block w-3 h-3 rounded-full ${
+          <span className={`inline-block w-3 h-3 rounded-full transition ${
             gameState.icpStatus === "normal" ? "bg-green-500" :
             gameState.icpStatus === "elevated" ? "bg-yellow-500" :
             gameState.icpStatus === "critical" ? "bg-red-500" :
@@ -116,13 +159,13 @@ const ICPSimulationGame = () => {
           gameState={gameState}
           currentScenario={currentScenario}
           scenariosCount={scenarios.length}
-          onMakeDecision={() => {}}
-          onCallDoctor={() => {}}
-          onContinue={() => {}}
+          onMakeDecision={makeDecision}
+          onCallDoctor={callDoctor}
+          onContinue={continueToNextScenario}
         />
       )}
 
-      <div className="text-center text-sm text-gray-500 mt-6">
+      <div className="text-center text-sm text-gray-500 mt-6 border-t pt-4">
         <p>This simulation contributes to your Continuing Professional Development in Neuroscience Nursing.</p>
       </div>
 
