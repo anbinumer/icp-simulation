@@ -80,7 +80,7 @@ const ICPSimulationGame = () => {
 
   const callDoctor = () => {
     if (gameState.doctorCallsRemaining > 0) {
-      const advice = scenarios[gameState.currentScenarioIndex].doctorAdvice || "Refer to current scenario guidance...";
+      const advice = (scenarios[gameState.currentScenarioIndex] as any).doctorAdvice || "Refer to current scenario guidance...";
       setGameState({
         ...gameState,
         doctorCallsRemaining: gameState.doctorCallsRemaining - 1,
