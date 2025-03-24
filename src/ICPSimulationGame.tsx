@@ -54,7 +54,7 @@ const ICPSimulationGame = () => {
   const [playerName, setPlayerName] = useState("");
 
   // Make a decision function
-  const makeDecision = (optionIndex) => {
+  const makeDecision = (optionIndex: number) => {
     const currentScenario = scenarios[gameState.currentScenarioIndex];
     const decision = currentScenario.options[optionIndex];
     
