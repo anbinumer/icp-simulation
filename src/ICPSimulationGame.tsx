@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Brain, PhoneCall, Sparkles, Trophy } from 'lucide-react';
 import { scenarios } from './data/scenarios';
-import { ScoreDisplay } from './components/ScoreDisplay';
 import GameInterface from './components/GameInterface';
 import { GameOverScreen } from './components/GameOverScreen';
 import { Leaderboard } from './components/Leaderboard';
@@ -11,8 +10,53 @@ import { Certificate } from './components/Certificate';
 import { SocialShare } from './components/SocialShare';
 import { updateVitalsBasedOnOutcome, determineOutcome, getBadgeAndRank, formatTime } from './utils/gameUtils';
 
+interface Scenario {
+  id: string;
+  title: string;
+  description: string;
+  question: string;
+  options: {
+    text: string;
+    outcome: "Positive" | "Negative" | "Neutral";
+    feedback: string;
+  }[];
+  doctorAdvice?: string;
+}
+
+interface GameState {
+  patientName: string;
+  age: number;
+  occupation: string;
+  doctorCallsRemaining: number;
+  icpStatus: "normal" | "elevated" | "critical" | "herniation";
+  gcsScore: number;
+  bp: string;
+  heartRate: number;
+  respiratoryPattern: string;
+  pupilRight: string;
+  pupilLeft: string;
+  motorResponse: string;
+  currentStage: string;
+  currentScenarioIndex: number;
+  decisions: number[];
+  gameOver: boolean;
+  outcome: any | null;
+  showDoctorAdvice: boolean;
+  doctorAdvice: string;
+  showFeedback: boolean;
+  lastDecision: number | null;
+  score: number;
+  totalPossibleScore: number;
+  bonusPoints: number;
+  timeTaken: number;
+  gameStartTime: Date;
+  decisionTimes: number[];
+  showConfetti: boolean;
+  showOutcome: boolean;
+}
+
 const ICPSimulationGame = () => {
-  const [gameState, setGameState] = useState({
+  const [gameState, setGameState] = useState<GameState>({
     patientName: "Sarah Chen",
     age: 28,
     occupation: "Software Engineer",
@@ -39,7 +83,7 @@ const ICPSimulationGame = () => {
     bonusPoints: 0,
     timeTaken: 0,
     gameStartTime: new Date(),
-    decisionTimes: [] as number[],
+    decisionTimes: [],
     showConfetti: false,
     showOutcome: false // newly added state
   });
@@ -80,7 +124,8 @@ const ICPSimulationGame = () => {
 
   const callDoctor = () => {
     if (gameState.doctorCallsRemaining > 0) {
-      const advice = (scenarios[gameState.currentScenarioIndex] as any).doctorAdvice || "Refer to current scenario guidance...";
+      const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
+      const advice = currentScenario.doctorAdvice || "Refer to current scenario guidance...";
       setGameState({
         ...gameState,
         doctorCallsRemaining: gameState.doctorCallsRemaining - 1,
