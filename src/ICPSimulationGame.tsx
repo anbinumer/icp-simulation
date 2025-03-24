@@ -39,7 +39,7 @@ const ICPSimulationGame = () => {
     
     // Scoring-related properties
     score: 0,
-totalPossibleScore: scenarios.length * 100, // Each scenario is worth 100 points max
+    totalPossibleScore: scenarios.length * 100, // Each scenario is worth 100 points max
     bonusPoints: 0,
     timeTaken: 0,
     gameStartTime: new Date(),
@@ -208,27 +208,25 @@ totalPossibleScore: scenarios.length * 100, // Each scenario is worth 100 points
       age: 28,
       occupation: "Software Engineer",
       doctorCallsRemaining: 3,
-      icpStatus: "elevated",
-      gcsScore: 13,
-      bp: "142/88",
-      heartRate: 72,
-      respiratoryPattern: "normal",
-      pupilRight: "slightly enlarged",
-      pupilLeft: "normal",
-      motorResponse: "intact",
-      currentStage: "initial",
-      currentScenarioIndex: 0,
-      decisions: [],
-      gameOver: false,
-      outcome: null,
-      showDoctorAdvice: false,
-      doctorAdvice: "",
-      showFeedback: false,
-      lastDecision: null,
-      
-      // Reset scoring-related properties
+      icpStatus: "Stable",
+      gcsScore: 15,
+      bp: "120/80",
+      heartRate: 75,
+      respiratoryPattern: "Normal",
+      pupilRight: "Reactive",
+      pupilLeft: "Reactive",
+      temperature: "37°C",
+      consciousness: "Alert",
+      motorResponse: "Obeys Commands",
+      verbalResponse: "Oriented",
+      eyeResponse: "Spontaneous",
+      intracranialPressure: 12,
+      oxygenSaturation: "98%",
+      scenarioIndex: 0,
+      currentScenario: scenarios[0],
       score: 0,
       bonusPoints: 0,
+      totalPossibleScore: scenarios.length * 100, // ✅ ✅ ✅ THIS LINE IS THE FIX
       timeTaken: 0,
       gameStartTime: new Date(),
       decisionTimes: []
