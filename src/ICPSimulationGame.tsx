@@ -1,6 +1,6 @@
-// Full game implementation (with logic + UI/UX polish)
+// Full game implementation (with logic + UI/UX polish + animation + feedback)
 import React, { useState } from 'react';
-import { Brain, PhoneCall } from 'lucide-react';
+import { Brain, PhoneCall, Sparkles, Trophy } from 'lucide-react';
 import { scenarios } from './data/scenarios';
 import { PatientStatusMonitor } from './components/PatientStatusMonitor';
 import { ScoreDisplay } from './components/ScoreDisplay';
@@ -40,7 +40,9 @@ const ICPSimulationGame = () => {
     bonusPoints: 0,
     timeTaken: 0,
     gameStartTime: new Date(),
-    decisionTimes: [] as number[]
+    decisionTimes: [] as number[],
+    showConfetti: false,
+    showOutcome: false // newly added state
   });
 
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -48,6 +50,8 @@ const ICPSimulationGame = () => {
   const [showCertificate, setShowCertificate] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [playerName, setPlayerName] = useState("");
+
+  const [waitingForNext, setWaitingForNext] = useState(false);
 
   const makeDecision = (optionIndex: number) => {
     const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
@@ -58,39 +62,49 @@ const ICPSimulationGame = () => {
     const updatedScore = isCorrect ? gameState.score + 100 : gameState.score;
     const updatedBonus = isCorrect && decisionTime < 5000 ? gameState.bonusPoints + 50 : gameState.bonusPoints;
 
-    const isLastScenario = gameState.currentScenarioIndex === scenarios.length - 1;
-
-    setGameState({
-      ...gameState,
+    setGameState(prev => ({
+      ...prev,
       ...updatedVitals,
-      currentScenarioIndex: isLastScenario ? gameState.currentScenarioIndex : gameState.currentScenarioIndex + 1,
-      decisions: [...gameState.decisions, optionIndex],
-      decisionTimes: [...gameState.decisionTimes, decisionTime],
+      decisions: [...prev.decisions, optionIndex],
+      decisionTimes: [...prev.decisionTimes, decisionTime],
       lastDecision: optionIndex,
+      outcome: outcome,
       score: updatedScore,
       bonusPoints: updatedBonus,
-      gameOver: isLastScenario,
-      outcome: isLastScenario ? outcome : null
-    });
+      showFeedback: true,
+      showConfetti: isCorrect && decisionTime < 5000,
+      showOutcome: true // delay advance
+    }));
+
+    setWaitingForNext(true);
   };
 
   const callDoctor = () => {
     if (gameState.doctorCallsRemaining > 0) {
+      const advice = scenarios[gameState.currentScenarioIndex].doctorAdvice || "Refer to current scenario guidance...";
       setGameState({
         ...gameState,
         doctorCallsRemaining: gameState.doctorCallsRemaining - 1,
         showDoctorAdvice: true,
-        doctorAdvice: "Refer to current scenario guidance..." // fallback text
+        doctorAdvice: advice
       });
     }
   };
 
   const continueToNextScenario = () => {
+    const isLastScenario = gameState.currentScenarioIndex === scenarios.length - 1;
     setGameState({
       ...gameState,
       showDoctorAdvice: false,
-      doctorAdvice: ""
+      doctorAdvice: "",
+      showFeedback: false,
+      outcome: null,
+      currentScenarioIndex: isLastScenario ? gameState.currentScenarioIndex : gameState.currentScenarioIndex + 1,
+      gameOver: isLastScenario,
+      showConfetti: false,
+      showOutcome: false
     });
+    setWaitingForNext(false);
   };
 
   const restartGame = () => {
@@ -108,7 +122,9 @@ const ICPSimulationGame = () => {
       bonusPoints: 0,
       timeTaken: 0,
       gameStartTime: new Date(),
-      decisionTimes: []
+      decisionTimes: [],
+      showConfetti: false,
+      showOutcome: false
     });
     setShowLeaderboard(false);
     setShowAchievements(false);
@@ -124,6 +140,12 @@ const ICPSimulationGame = () => {
         <Brain className="h-8 w-8 text-blue-600 animate-pulse" />
         <h1 className="text-2xl font-bold text-blue-600">ICP Management Simulation: Sarah Chen's Case</h1>
       </div>
+
+      {gameState.showConfetti && (
+        <div className="text-center text-green-500 font-semibold animate-bounce">
+          🎉 Bonus Achieved for Fast & Accurate Decision!
+        </div>
+      )}
 
       <div className="flex items-center justify-between border-b pb-2">
         <div className="flex items-center space-x-2">
@@ -171,14 +193,19 @@ const ICPSimulationGame = () => {
       </div>
 
       {showLeaderboard && (
-        <Leaderboard 
-          gameState={gameState}
-          playerName={playerName}
-          setPlayerName={setPlayerName}
-          onClose={() => setShowLeaderboard(false)}
-          getBadgeAndRank={getBadgeAndRank}
-          formatTime={formatTime}
-        />
+        <div className="animate-fade-in transition-all duration-500 ease-in-out">
+          <div className="flex justify-center mb-4">
+            <Trophy className="h-10 w-10 text-yellow-400 animate-bounce" />
+          </div>
+          <Leaderboard 
+            gameState={gameState}
+            playerName={playerName}
+            setPlayerName={setPlayerName}
+            onClose={() => setShowLeaderboard(false)}
+            getBadgeAndRank={getBadgeAndRank}
+            formatTime={formatTime}
+          />
+        </div>
       )}
 
       {showAchievements && (
