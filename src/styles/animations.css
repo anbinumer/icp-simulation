@@ -1,0 +1,44 @@
+/* src/styles/animations.css */
+
+@keyframes pulse-normal {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes pulse-fast {
+    0% { transform: scale(1); opacity: 1; }
+    40% { transform: scale(1.12); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes pulse-very-fast {
+    0% { transform: scale(1); opacity: 1; }
+    30% { transform: scale(1.15); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes pulse-erratic {
+    0% { transform: scale(1); opacity: 1; }
+    20% { transform: scale(1.2); opacity: 0.7; }
+    40% { transform: scale(0.9); opacity: 0.9; }
+    60% { transform: scale(1.1); opacity: 0.8; }
+    80% { transform: scale(0.95); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .animate-pulse-normal {
+    animation: pulse-normal 1.2s infinite; /* ~60 BPM */
+  }
+  
+  .animate-pulse-fast {
+    animation: pulse-fast 0.95s infinite; /* ~65 BPM */
+  }
+  
+  .animate-pulse-very-fast {
+    animation: pulse-very-fast 0.75s infinite; /* ~80 BPM */
+  }
+  
+  .animate-pulse-erratic {
+    animation: pulse-erratic 2s infinite; /* Irregular */
+  }
