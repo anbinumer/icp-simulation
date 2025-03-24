@@ -40,7 +40,7 @@ interface GameState {
   currentScenarioIndex: number;
   decisions: number[];
   gameOver: boolean;
-  outcome: any | null;
+  outcome: { result: "correct" | "incorrect"; feedback: string } | null;
   showDoctorAdvice: boolean;
   doctorAdvice: string;
   showFeedback: boolean;
