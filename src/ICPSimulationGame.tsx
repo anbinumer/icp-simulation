@@ -70,7 +70,7 @@ const ICPSimulationGame = () => {
       score: updatedScore,
       bonusPoints: updatedBonus,
       gameOver: isLastScenario,
-      outcome: isLastScenario ? determineOutcome(gameState.currentScenarioIndex, optionIndex) : null
+      outcome: isLastScenario ? outcome : null
     });
   };
 
@@ -80,7 +80,7 @@ const ICPSimulationGame = () => {
         ...gameState,
         doctorCallsRemaining: gameState.doctorCallsRemaining - 1,
         showDoctorAdvice: true,
-        doctorAdvice: scenarios[gameState.currentScenarioIndex].doctorAdvice
+        doctorAdvice: "Refer to current scenario guidance..." // fallback text
       });
     }
   };
