@@ -54,8 +54,9 @@ const ICPSimulationGame = () => {
     const outcome = determineOutcome(gameState.currentScenarioIndex, optionIndex);
     const updatedVitals = updateVitalsBasedOnOutcome(gameState, outcome);
 
-    const updatedScore = outcome.correct ? gameState.score + 100 : gameState.score;
-    const updatedBonus = outcome.correct && decisionTime < 5000 ? gameState.bonusPoints + 50 : gameState.bonusPoints;
+    const isCorrect = outcome.result === "correct";
+    const updatedScore = isCorrect ? gameState.score + 100 : gameState.score;
+    const updatedBonus = isCorrect && decisionTime < 5000 ? gameState.bonusPoints + 50 : gameState.bonusPoints;
 
     const isLastScenario = gameState.currentScenarioIndex === scenarios.length - 1;
 
