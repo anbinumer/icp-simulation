@@ -39,7 +39,7 @@ const ICPSimulationGame = () => {
     
     // Scoring-related properties
     score: 0,
-    totalPossibleScore: scenarios.length * 100, // Each scenario is worth 100 points max
+totalPossibleScore: scenarios.length * 100, // Each scenario is worth 100 points max
     bonusPoints: 0,
     timeTaken: 0,
     gameStartTime: new Date(),
