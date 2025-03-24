@@ -23,6 +23,7 @@ const ICPSimulationGame = () => {
     gcsScore: 13, // Glasgow Coma Scale (3-15)
     bp: "142/88",
     heartRate: 72,
+    temperature: "37°C", // ✅ add this line in the original gameState
     respiratoryPattern: "normal",
     pupilRight: "slightly enlarged",
     pupilLeft: "normal",
