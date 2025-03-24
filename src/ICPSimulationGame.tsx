@@ -2,9 +2,8 @@
 import React, { useState } from 'react';
 import { Brain, PhoneCall, Sparkles, Trophy } from 'lucide-react';
 import { scenarios } from './data/scenarios';
-import { PatientStatusMonitor } from './components/PatientStatusMonitor';
 import { ScoreDisplay } from './components/ScoreDisplay';
-import { GameInterface } from './components/GameInterface';
+import GameInterface from './components/GameInterface';
 import { GameOverScreen } from './components/GameOverScreen';
 import { Leaderboard } from './components/Leaderboard';
 import { Achievements } from './components/Achievements';
