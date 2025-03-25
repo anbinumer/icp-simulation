@@ -23,6 +23,11 @@ interface Scenario {
   doctorAdvice?: string;
 }
 
+interface Outcome {
+  result: "Poor Outcome" | "Moderate Outcome" | "Excellent Outcome";
+  description: string;
+}
+
 interface GameState {
   patientName: string;
   age: number;
@@ -38,9 +43,9 @@ interface GameState {
   motorResponse: string;
   currentStage: string;
   currentScenarioIndex: number;
-  decisions: number[];
+  decisions: { scenario: string; decision: { outcome: "Positive" | "Negative" | "Neutral" } }[];
   gameOver: boolean;
-  outcome: { result: "correct" | "incorrect"; feedback: string } | null;
+  outcome: Outcome | null;
   showDoctorAdvice: boolean;
   doctorAdvice: string;
   showFeedback: boolean;
@@ -98,17 +103,25 @@ const ICPSimulationGame = () => {
 
   const makeDecision = (optionIndex: number) => {
     const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
-    const outcome = determineOutcome(gameState.currentScenarioIndex, optionIndex);
+    
+    const updatedDecisions = [...gameState.decisions, {
+      scenario: scenarios[gameState.currentScenarioIndex].id,
+      decision: {
+        outcome: scenarios[gameState.currentScenarioIndex].options[optionIndex].outcome
+      }
+    }];
+    
+    const outcome = determineOutcome(updatedDecisions, gameState.icpStatus);
     const updatedVitals = updateVitalsBasedOnOutcome(gameState, outcome);
 
-    const isCorrect = outcome.result === "correct";
+    const isCorrect = outcome.result === "Excellent Outcome";
     const updatedScore = isCorrect ? gameState.score + 100 : gameState.score;
     const updatedBonus = isCorrect && decisionTime < 5000 ? gameState.bonusPoints + 50 : gameState.bonusPoints;
 
     setGameState(prev => ({
       ...prev,
       ...updatedVitals,
-      decisions: [...prev.decisions, optionIndex],
+      decisions: updatedDecisions,
       decisionTimes: [...prev.decisionTimes, decisionTime],
       lastDecision: optionIndex,
       outcome: outcome,
@@ -116,7 +129,7 @@ const ICPSimulationGame = () => {
       bonusPoints: updatedBonus,
       showFeedback: true,
       showConfetti: isCorrect && decisionTime < 5000,
-      showOutcome: true // delay advance
+      showOutcome: true
     }));
 
     setWaitingForNext(true);

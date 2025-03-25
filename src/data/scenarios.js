@@ -26,7 +26,8 @@ export const scenarios = [
         outcome: "Negative", 
         feedback: "Positioning the patient flat may increase ICP. Sarah's ICP increases, and her condition worsens. Head elevation of 30° would have been more appropriate." 
       }
-    ]
+    ],
+    doctorAdvice: "Focus on establishing a thorough neurological baseline. Monitor GCS, pupillary response, and vital signs closely. Position the head of bed at 30 degrees and ensure continuous neuro checks every 15 minutes. Alert me immediately of any deterioration in mental status or pupillary changes."
   },
   {
     id: "monitoring",
@@ -54,7 +55,8 @@ export const scenarios = [
         outcome: "Negative", 
         feedback: "Lowering the head of bed will increase ICP further. Sarah's condition deteriorates rapidly, and she shows signs of herniation." 
       }
-    ]
+    ],
+    doctorAdvice: "These changes are concerning for increasing ICP. Be prepared for rapid intervention. Continue close monitoring of vital signs and prepare for possible osmotic therapy. If GCS drops by 2 or more points, or if pupillary changes worsen, we may need to consider immediate surgical intervention."
   },
   {
     id: "intervention",
@@ -82,7 +84,8 @@ export const scenarios = [
         outcome: "Negative", 
         feedback: "Delaying interventions to repeat imaging when there are clear clinical signs of deterioration wastes valuable time. Sarah's condition worsens significantly during transport to CT." 
       }
-    ]
+    ],
+    doctorAdvice: "Administer mannitol 1g/kg IV over 30 minutes. Target mild hyperventilation (PaCO2 30-35 mmHg). Monitor for signs of herniation including pupillary changes, decerebrate posturing, or Cushing's triad. Keep me updated on her response to these interventions."
   },
   {
     id: "critical",
@@ -110,7 +113,8 @@ export const scenarios = [
         outcome: "Negative", 
         feedback: "Sedatives may mask neurological symptoms and could further depress respiratory drive. Without securing the airway first, this intervention leads to respiratory depression and worsening hypercapnia." 
       }
-    ]
+    ],
+    doctorAdvice: "Prepare for immediate rapid sequence intubation. Have emergency airway equipment ready. Continue mannitol as prescribed. Target hyperventilation once airway is secured. Document neurological status every 5 minutes until I arrive. OR team has been notified to prepare for possible emergency decompressive craniectomy."
   },
   {
     id: "resolution",
@@ -138,6 +142,7 @@ export const scenarios = [
         outcome: "Positive", 
         feedback: "Excellent. Maintaining proper positioning and continuing all ICP management during transport is crucial. Your attention to these details ensures Sarah arrives at the OR in the best possible condition." 
       }
-    ]
+    ],
+    doctorAdvice: "Maintain ICP monitoring during transport. Continue current medical management including mannitol and controlled hyperventilation. Keep head elevated at 30 degrees during transfer. Time is critical - let's move as soon as the OR confirms readiness. Have all relevant imaging and lab results ready for OR team review."
   }
 ];
