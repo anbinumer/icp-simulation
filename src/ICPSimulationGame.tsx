@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Brain, PhoneCall, Sparkles, Heart, Activity, AlertCircle } from 'lucide-react';
 import { scenarios } from './data/scenarios';
-import { GameInterface } from './components/GameInterface';
+import GameInterface from './components/GameInterface';
 import { GameOverScreen } from './components/GameOverScreen';
 import { Leaderboard } from './components/Leaderboard';
 import { Achievements } from './components/Achievements';
