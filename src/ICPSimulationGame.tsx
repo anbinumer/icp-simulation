@@ -75,7 +75,7 @@ const ICPSimulationGame = () => {
     const decision = currentScenario.options[optionIndex];
     
     // Calculate decision time
-    const decisionTime = new Date() - gameState.gameStartTime;
+    const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
     const updatedDecisionTimes = [...gameState.decisionTimes, decisionTime];
     
     // Update patient state based on decision outcome
