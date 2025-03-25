@@ -1,12 +1,14 @@
-// src/app/page.tsx
-"use client"
+import dynamic from 'next/dynamic';
 
-import ICPSimulationGame from '@/ICPSimulationGame';
-import '@/styles/globals.css';
+// Import the game component with SSR disabled
+const ICPSimulationGame = dynamic(
+  () => import('../../src/ICPSimulationGame'),
+  { ssr: false }
+);
 
-export default function Home() {
+export default function GamePage() {
   return (
-    <main className="min-h-screen bg-gray-900">
+    <main>
       <ICPSimulationGame />
     </main>
   );
