@@ -60,16 +60,23 @@ const ICPSimulationGame = () => {
     // Set dark theme on the body
     document.body.classList.add('gaming-dark');
     
-    // Background ambient sound
-    const ambientSound = new Audio('/sounds/ambient.mp3');
-    ambientSound.volume = 0.1;
-    ambientSound.loop = true;
-    ambientSound.play().catch(e => console.log('Ambient sound autoplay prevented'));
+    // Background ambient sound - only initialize in browser environment
+    let ambientSound: HTMLAudioElement | undefined;
+    
+    // Check if code is running in browser environment
+    if (typeof window !== 'undefined') {
+      ambientSound = new Audio('/sounds/ambient.mp3');
+      ambientSound.volume = 0.1;
+      ambientSound.loop = true;
+      ambientSound.play().catch(e => console.log('Ambient sound autoplay prevented'));
+    }
     
     // Cleanup function
     return () => {
       document.body.classList.remove('gaming-dark');
-      ambientSound.pause();
+      if (ambientSound) {
+        ambientSound.pause();
+      }
     };
   }, []);
 
