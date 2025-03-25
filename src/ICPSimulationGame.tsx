@@ -120,95 +120,100 @@ const ICPSimulationGame = () => {
   // Removed all useEffect and browser-specific APIs
 
   const makeDecision = (optionIndex: number) => {
-    const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
-    const decision = currentScenario.options[optionIndex] as ScenarioOption;
-    
-    // Calculate decision time
-    const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
-    const updatedDecisionTimes = [...gameState.decisionTimes, decisionTime];
-    
-    // Update patient state based on decision outcome
-    const updatedVitals = updateVitalsBasedOnOutcome(gameState, decision.outcome);
-    
-    // Update decisions history with current patient status
-    const newDecision: Decision = {
-      scenario: currentScenario.id,
-      decision: decision,
-      timeToDecide: decisionTime,
-      patientStatus: updatedVitals.icpStatus
-    };
-    
-    const updatedDecisions = [...gameState.decisions, newDecision];
-    
-    // Calculate points for this decision
-    let decisionPoints = 0;
-    let bonusPoints = gameState.bonusPoints;
-    
-    switch(decision.outcome) {
-      case "Positive":
-        decisionPoints = 100; // Full points for best decision
-        bonusPoints += 25; // Bonus for making the best choice
-        break;
-      case "Neutral":
-        decisionPoints = 50; // Half points for acceptable decision
-        break;
-      case "Negative":
-        decisionPoints = 0; // No points for poor decision
-        break;
-      default:
-        decisionPoints = 0;
-        break;
-    }
-    
-    // Apply time bonus/penalty
-    let timeBonus = 0;
-    let showConfetti = false;
-    if (decision.outcome === "Positive" && decisionTime < 30000) { // 30 seconds threshold
-      timeBonus = Math.floor((30000 - decisionTime) / 1000); // 1 point per second under 30
-      bonusPoints += timeBonus;
-      showConfetti = true;
-    }
-    
-    // Calculate total score so far
-    const updatedScore = gameState.score + decisionPoints;
-    
-    // Check if game should end
-    const isLastScenario = gameState.currentScenarioIndex >= scenarios.length - 1;
-    const isHerniation = updatedVitals.icpStatus === "herniation";
-    const gameEnded = isLastScenario || isHerniation;
-    
-    // Calculate outcome if game is over
-    let finalOutcome = null;
-    if (gameEnded) {
-      finalOutcome = determineOutcome(updatedDecisions, updatedVitals.icpStatus as ICPStatus); // Add type assertion
+    try {
+      const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
+      const decision = currentScenario.options[optionIndex] as ScenarioOption;
       
-      // Add completion bonus if patient survived
-      if (updatedVitals.icpStatus !== "herniation") {
-        bonusPoints += 100; // Bonus for completing without herniation
+      // Calculate decision time
+      const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
+      const updatedDecisionTimes = [...gameState.decisionTimes, decisionTime];
+      
+      // Update patient state based on decision outcome
+      const updatedVitals = updateVitalsBasedOnOutcome(gameState, decision.outcome);
+      
+      // Update decisions history with current patient status
+      const newDecision: Decision = {
+        scenario: currentScenario.id,
+        decision: decision,
+        timeToDecide: decisionTime,
+        patientStatus: updatedVitals.icpStatus
+      };
+      
+      const updatedDecisions = [...gameState.decisions, newDecision];
+      
+      // Calculate points for this decision
+      let decisionPoints = 0;
+      let bonusPoints = gameState.bonusPoints;
+      
+      switch(decision.outcome) {
+        case "Positive":
+          decisionPoints = 100; // Full points for best decision
+          bonusPoints += 25; // Bonus for making the best choice
+          break;
+        case "Neutral":
+          decisionPoints = 50; // Half points for acceptable decision
+          break;
+        case "Negative":
+          decisionPoints = 0; // No points for poor decision
+          break;
+        default:
+          decisionPoints = 0;
+          break;
       }
+      
+      // Apply time bonus/penalty
+      let timeBonus = 0;
+      let showConfetti = false;
+      if (decision.outcome === "Positive" && decisionTime < 30000) { // 30 seconds threshold
+        timeBonus = Math.floor((30000 - decisionTime) / 1000); // 1 point per second under 30
+        bonusPoints += timeBonus;
+        showConfetti = true;
+      }
+      
+      // Calculate total score so far
+      const updatedScore = gameState.score + decisionPoints;
+      
+      // Check if game should end
+      const isLastScenario = gameState.currentScenarioIndex >= scenarios.length - 1;
+      const isHerniation = updatedVitals.icpStatus === "herniation";
+      const gameEnded = isLastScenario || isHerniation;
+      
+      // Calculate outcome if game is over
+      let finalOutcome = null;
+      if (gameEnded) {
+        finalOutcome = determineOutcome(updatedDecisions, updatedVitals.icpStatus as ICPStatus); // Add type assertion
+        
+        // Add completion bonus if patient survived
+        if (updatedVitals.icpStatus !== "herniation") {
+          bonusPoints += 100; // Bonus for completing without herniation
+        }
+      }
+      
+      // Calculate total time taken
+      const totalTime = gameState.timeTaken + decisionTime;
+      
+      // Update game state
+      setGameState({
+        ...gameState,
+        ...updatedVitals,
+        decisions: updatedDecisions,
+        decisionTimes: updatedDecisionTimes,
+        currentScenarioIndex: isLastScenario ? gameState.currentScenarioIndex : gameState.currentScenarioIndex + 1,
+        gameOver: gameEnded,
+        outcome: finalOutcome,
+        showFeedback: true,
+        lastDecision: newDecision,
+        score: updatedScore,
+        bonusPoints: bonusPoints,
+        timeTaken: totalTime,
+        // Reset the game start time for the next decision timing
+        gameStartTime: new Date(),
+        showConfetti: showConfetti
+      });
+    } catch (error) {
+      console.error("Error in makeDecision:", error);
+      // Maybe show a user-friendly error message
     }
-    
-    // Calculate total time taken
-    const totalTime = gameState.timeTaken + decisionTime;
-    
-    // Update game state
-    setGameState({
-      ...gameState,
-      ...updatedVitals,
-      decisions: updatedDecisions,
-      decisionTimes: updatedDecisionTimes,
-      currentScenarioIndex: isLastScenario ? gameState.currentScenarioIndex : gameState.currentScenarioIndex + 1,
-      gameOver: gameEnded,
-      outcome: finalOutcome,
-      showFeedback: true,
-      lastDecision: decision,
-      score: updatedScore,
-      bonusPoints: bonusPoints,
-      timeTaken: totalTime,
-      // Reset the game start time for the next decision timing
-      gameStartTime: new Date(),
-      showConfetti: showConfetti
-    });
   };
 
   // Function to call doctor for advice
