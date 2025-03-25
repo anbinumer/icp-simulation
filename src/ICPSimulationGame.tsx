@@ -250,6 +250,7 @@ const ICPSimulationGame = () => {
       
       // Reset scoring-related properties
       score: 0,
+      totalPossibleScore: scenarios.length * 100, // This was missing
       bonusPoints: 0,
       timeTaken: 0,
       gameStartTime: new Date(),
