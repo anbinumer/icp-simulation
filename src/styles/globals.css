@@ -1,0 +1,70 @@
+/* styles/globals.css */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.2); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 100, 255, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+}
+
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-heartbeat { animation: heartbeat 1s infinite; }
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+.animate-slide-in { animation: slideIn 0.3s ease-out; }
+.animate-glow { animation: glow 2s infinite; }
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Gaming dark theme */
+.gaming-dark {
+  background-color: #0a1323;
+  color: #e0f2ff;
+}
+
+/* Status colors */
+.status-normal { color: #2ecc71; }
+.status-elevated { color: #f39c12; }
+.status-critical { color: #e74c3c; }
+.status-herniation { color: #8e44ad; }
+
+/* Medical waveform */
+.waveform {
+  height: 2px;
+  background: linear-gradient(90deg, #2ecc71 0%, #2ecc71 50%, transparent 50%, transparent 100%);
+  background-size: 10px 10px;
+  animation: waveform-move 0.5s infinite linear;
+}
+
+@keyframes waveform-move {
+  from { background-position: 0 0; }
+  to { background-position: 10px 0; }
+}

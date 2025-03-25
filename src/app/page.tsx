@@ -1,11 +1,12 @@
+// src/app/page.tsx
 "use client"
 
 import ICPSimulationGame from '@/ICPSimulationGame';
-import '@/styles/animations.css';
+import '@/styles/globals.css';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-gray-900">
       <ICPSimulationGame />
     </main>
   );
