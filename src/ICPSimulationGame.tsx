@@ -13,6 +13,33 @@ import { updateVitalsBasedOnOutcome, determineOutcome, getBadgeAndRank, formatTi
 // Define ICPStatus type to ensure consistency
 type ICPStatus = "normal" | "elevated" | "critical" | "herniation";
 
+// Client-only component for browser-specific features
+const ClientSideEffects = () => {
+  useEffect(() => {
+    // This code only runs in the browser
+    document.body.classList.add('gaming-dark');
+    
+    let ambientSound: HTMLAudioElement;
+    try {
+      ambientSound = new Audio('/sounds/ambient.mp3');
+      ambientSound.volume = 0.1;
+      ambientSound.loop = true;
+      ambientSound.play().catch(e => console.log('Ambient sound autoplay prevented'));
+    } catch (e) {
+      console.log('Audio initialization failed:', e);
+    }
+    
+    return () => {
+      document.body.classList.remove('gaming-dark');
+      if (ambientSound) {
+        ambientSound.pause();
+      }
+    };
+  }, []);
+  
+  return null; // This component doesn't render anything
+};
+
 const ICPSimulationGame = () => {
   // State for the game
   const [gameState, setGameState] = useState({
@@ -55,30 +82,7 @@ const ICPSimulationGame = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [playerName, setPlayerName] = useState("");
 
-  // Theme setup effect
-  useEffect(() => {
-    // Set dark theme on the body
-    document.body.classList.add('gaming-dark');
-    
-    // Background ambient sound - only initialize in browser environment
-    let ambientSound: HTMLAudioElement | undefined;
-    
-    // Check if code is running in browser environment
-    if (typeof window !== 'undefined') {
-      ambientSound = new Audio('/sounds/ambient.mp3');
-      ambientSound.volume = 0.1;
-      ambientSound.loop = true;
-      ambientSound.play().catch(e => console.log('Ambient sound autoplay prevented'));
-    }
-    
-    // Cleanup function
-    return () => {
-      document.body.classList.remove('gaming-dark');
-      if (ambientSound) {
-        ambientSound.pause();
-      }
-    };
-  }, []);
+  // No useEffect for theme here - moved to ClientSideEffects
 
   const makeDecision = (optionIndex: number) => {
     const currentScenario = scenarios[gameState.currentScenarioIndex];
@@ -277,6 +281,9 @@ const ICPSimulationGame = () => {
 
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto p-4 space-y-6 gaming-dark min-h-screen">
+      {/* Client-side effects only run in browser */}
+      {typeof window !== 'undefined' && <ClientSideEffects />}
+      
       <div className="glass p-4 rounded-lg border border-blue-800 mb-6">
         <div className="flex items-center space-x-3">
           <Brain className="h-10 w-10 text-blue-400 animate-pulse" />
