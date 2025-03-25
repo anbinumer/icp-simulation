@@ -9,7 +9,7 @@ import { Achievements } from './components/Achievements';
 import { Certificate } from './components/Certificate';
 import { SocialShare } from './components/SocialShare';
 import { updateVitalsBasedOnOutcome, determineOutcome, getBadgeAndRank, formatTime } from './utils/gameUtils';
-import './app/styles/gaming-theme.css';
+import './styles/gaming-theme.css';
 
 // Define ICPStatus type to ensure consistency
 type ICPStatus = "normal" | "elevated" | "critical" | "herniation";
