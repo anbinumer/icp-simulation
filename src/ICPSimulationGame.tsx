@@ -70,7 +70,7 @@ const ICPSimulationGame = () => {
     };
   }, []);
 
-  const makeDecision = (optionIndex) => {
+  const makeDecision = (optionIndex: number) => {
     const currentScenario = scenarios[gameState.currentScenarioIndex];
     const decision = currentScenario.options[optionIndex];
     
