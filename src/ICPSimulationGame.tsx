@@ -14,14 +14,27 @@ import './styles/gaming-theme.css';
 // Define ICPStatus type to ensure consistency
 type ICPStatus = "normal" | "elevated" | "critical" | "herniation";
 
-// Define types for your decision objects
+// First, define the option type to match exactly what's in your scenarios
+interface ScenarioOption {
+  text: string;
+  outcome: "Positive" | "Negative" | "Neutral";
+  feedback: string;
+}
+
+// Update your Scenario interface
+interface Scenario {
+  id: string;
+  title: string;
+  description: string;
+  question: string;
+  options: ScenarioOption[];
+  doctorAdvice?: string;
+}
+
+// Then update your Decision interface
 interface Decision {
   scenario: string;
-  decision: {
-    text: string;
-    outcome: "Positive" | "Negative" | "Neutral";
-    feedback: string;
-  };
+  decision: ScenarioOption; // Use the same option type
   timeToDecide: number;
   patientStatus: ICPStatus;
 }
@@ -107,8 +120,8 @@ const ICPSimulationGame = () => {
   // Removed all useEffect and browser-specific APIs
 
   const makeDecision = (optionIndex: number) => {
-    const currentScenario = scenarios[gameState.currentScenarioIndex];
-    const decision = currentScenario.options[optionIndex];
+    const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
+    const decision = currentScenario.options[optionIndex] as ScenarioOption;
     
     // Calculate decision time
     const decisionTime = new Date().getTime() - gameState.gameStartTime.getTime();
@@ -213,7 +226,7 @@ const ICPSimulationGame = () => {
     const updatedCalls = gameState.doctorCallsRemaining - 1;
     
     // Get current scenario
-    const currentScenario = scenarios[gameState.currentScenarioIndex];
+    const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
     let advice = "";
     
     // Generate advice based on current scenario
@@ -302,7 +315,7 @@ const ICPSimulationGame = () => {
   };
 
   // Get current scenario
-  const currentScenario = scenarios[gameState.currentScenarioIndex];
+  const currentScenario = scenarios[gameState.currentScenarioIndex] as Scenario;
 
   // Status indicator color classes
   const getStatusClass = (status: ICPStatus) => {
