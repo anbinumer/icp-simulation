@@ -1,4 +1,4 @@
-// src/ICPSimulationGame.jsx
+// src/ICPSimulationGame.tsx
 import React, { useState, useEffect } from 'react';
 import { Brain, PhoneCall, Sparkles } from 'lucide-react';
 import { scenarios } from './data/scenarios';
@@ -10,6 +10,9 @@ import { Certificate } from './components/Certificate';
 import { SocialShare } from './components/SocialShare';
 import { updateVitalsBasedOnOutcome, determineOutcome, getBadgeAndRank, formatTime } from './utils/gameUtils';
 
+// Define ICPStatus type to ensure consistency
+type ICPStatus = "normal" | "elevated" | "critical" | "herniation";
+
 const ICPSimulationGame = () => {
   // State for the game
   const [gameState, setGameState] = useState({
@@ -17,7 +20,7 @@ const ICPSimulationGame = () => {
     age: 28,
     occupation: "Software Engineer",
     doctorCallsRemaining: 3,
-    icpStatus: "elevated", // normal, elevated, critical, herniation
+    icpStatus: "elevated" as ICPStatus, // Using the defined type
     gcsScore: 13, // Glasgow Coma Scale (3-15)
     bp: "142/88",
     heartRate: 72,
@@ -86,7 +89,7 @@ const ICPSimulationGame = () => {
       scenario: currentScenario.id,
       decision: decision,
       timeToDecide: decisionTime,
-      patientStatus: updatedVitals.icpStatus // Save patient status with each decision
+      patientStatus: updatedVitals.icpStatus as ICPStatus // Add type assertion here
     }];
     
     // Calculate points for this decision
@@ -129,7 +132,7 @@ const ICPSimulationGame = () => {
     // Calculate outcome if game is over
     let finalOutcome = null;
     if (gameEnded) {
-      finalOutcome = determineOutcome(updatedDecisions, updatedVitals.icpStatus);
+      finalOutcome = determineOutcome(updatedDecisions, updatedVitals.icpStatus as ICPStatus); // Add type assertion
       
       // Add completion bonus if patient survived
       if (updatedVitals.icpStatus !== "herniation") {
@@ -227,7 +230,7 @@ const ICPSimulationGame = () => {
       age: 28,
       occupation: "Software Engineer",
       doctorCallsRemaining: 3,
-      icpStatus: "elevated",
+      icpStatus: "elevated" as ICPStatus, // Using the defined type 
       gcsScore: 13,
       bp: "142/88",
       heartRate: 72,
