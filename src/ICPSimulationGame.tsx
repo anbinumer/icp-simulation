@@ -34,7 +34,7 @@ interface Scenario {
 // Then update your Decision interface
 interface Decision {
   scenario: string;
-  decision: ScenarioOption; // Use the same option type
+  decision: ScenarioOption; // The outcome is in here
   timeToDecide: number;
   patientStatus: ICPStatus;
 }
@@ -471,11 +471,11 @@ const ICPSimulationGame = () => {
               
               {gameState.showFeedback && gameState.lastDecision && (
                 <div className={`feedback card mt-4 ${
-                  gameState.lastDecision.outcome === "Positive" ? "bg-green-900" : 
-                  gameState.lastDecision.outcome === "Neutral" ? "bg-yellow-900" : "bg-red-900"
+                  gameState.lastDecision.decision.outcome === "Positive" ? "bg-green-900" : 
+                  gameState.lastDecision.decision.outcome === "Neutral" ? "bg-yellow-900" : "bg-red-900"
                 }`}>
                   <h3 className="text-lg font-medium mb-2">Feedback</h3>
-                  <p className="text-gray-200 mb-4">{gameState.lastDecision.feedback}</p>
+                  <p className="text-gray-200 mb-4">{gameState.lastDecision.decision.feedback}</p>
                   <button 
                     className="call-doctor-button"
                     onClick={continueGame}
