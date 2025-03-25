@@ -14,9 +14,56 @@ import './styles/gaming-theme.css';
 // Define ICPStatus type to ensure consistency
 type ICPStatus = "normal" | "elevated" | "critical" | "herniation";
 
+// Define types for your decision objects
+interface Decision {
+  scenario: string;
+  decision: {
+    text: string;
+    outcome: "Positive" | "Negative" | "Neutral";
+    feedback: string;
+  };
+  timeToDecide: number;
+  patientStatus: ICPStatus;
+}
+
+// Define the outcome type
+interface Outcome {
+  result: "Poor Outcome" | "Moderate Outcome" | "Excellent Outcome";
+  description: string;
+}
+
 const ICPSimulationGame = () => {
   // State for the game
-  const [gameState, setGameState] = useState({
+  const [gameState, setGameState] = useState<{
+    patientName: string;
+    age: number;
+    occupation: string;
+    doctorCallsRemaining: number;
+    icpStatus: ICPStatus;
+    gcsScore: number;
+    bp: string;
+    heartRate: number;
+    respiratoryPattern: string;
+    pupilRight: string;
+    pupilLeft: string;
+    motorResponse: string;
+    currentStage: string;
+    currentScenarioIndex: number;
+    decisions: Decision[];
+    gameOver: boolean;
+    outcome: Outcome | null;
+    showDoctorAdvice: boolean;
+    doctorAdvice: string;
+    showFeedback: boolean;
+    lastDecision: Decision | null;
+    score: number;
+    totalPossibleScore: number;
+    bonusPoints: number;
+    timeTaken: number;
+    gameStartTime: Date;
+    decisionTimes: number[];
+    showConfetti: boolean;
+  }>({
     patientName: "Sarah Chen",
     age: 28,
     occupation: "Software Engineer",
@@ -71,12 +118,14 @@ const ICPSimulationGame = () => {
     const updatedVitals = updateVitalsBasedOnOutcome(gameState, decision.outcome);
     
     // Update decisions history with current patient status
-    const updatedDecisions = [...gameState.decisions, {
+    const newDecision: Decision = {
       scenario: currentScenario.id,
       decision: decision,
       timeToDecide: decisionTime,
-      patientStatus: updatedVitals.icpStatus as ICPStatus // Add type assertion here
-    }];
+      patientStatus: updatedVitals.icpStatus
+    };
+    
+    const updatedDecisions = [...gameState.decisions, newDecision];
     
     // Calculate points for this decision
     let decisionPoints = 0;
