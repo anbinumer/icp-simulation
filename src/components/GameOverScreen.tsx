@@ -1,34 +1,73 @@
-// components/GameOverScreen.jsx
+// components/GameOverScreen.tsx
+import { scenarios } from '../data/scenarios';
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, RotateCcw, CheckCircle, AlertCircle, Share2, Trophy, Award, Star } from 'lucide-react';
 import Confetti from 'react-confetti';
+import { GameState, BadgeInfo } from '../types';
+import { saveGameState, loadGameState } from '@/utils/storage';
 
-export const GameOverScreen = ({ 
-  gameState, 
-  playerName, 
-  setPlayerName, 
-  onRestart, 
-  onShowLeaderboard, 
-  onShowAchievements, 
-  onShowCertificate, 
-  onShowShare, 
-  getBadgeAndRank, 
-  formatTime 
+interface GameOverScreenProps {
+  gameState: GameState;
+  setGameState: (state: GameState | ((prevState: GameState) => GameState)) => void;
+  playerName: string;
+  setPlayerName: (name: string) => void;
+  onRestart: () => void;
+  onShowLeaderboard: () => void;
+  onShowAchievements: () => void;
+  onShowCertificate: () => void;
+  onShowShare: () => void;
+  getBadgeAndRank: (score: number, totalPossible: number, icpStatus: string) => BadgeInfo;
+  formatTime: (milliseconds: number) => string;
+}
+
+export const GameOverScreen: React.FC<GameOverScreenProps> = ({
+  gameState,
+  setGameState,
+  playerName,
+  setPlayerName,
+  onRestart,
+  onShowLeaderboard,
+  onShowAchievements,
+  onShowCertificate,
+  onShowShare,
+  getBadgeAndRank,
+  formatTime
 }) => {
+  useEffect(() => {
+    const savedState = loadGameState();
+    if (savedState) {
+      setGameState(savedState);
+    }
+  }, []);
+
   useEffect(() => {
     // Play success or failure sound
     const sound = new Audio(gameState.outcome?.result === "Excellent Outcome" ? 
                            '/sounds/success.mp3' : '/sounds/gameover.mp3');
     sound.volume = 0.3;
     sound.play();
-  }, [gameState.outcome]);
+    
+    // Save game state whenever it changes
+    saveGameState(gameState);
+  }, [gameState]);
+
+  useEffect(() => {
+    setGameState(prevState => ({
+      ...prevState,
+      // your state updates here
+    }));
+  }, [setGameState]);
 
   // Calculate total score for visual displays
   const totalScore = gameState.score + gameState.bonusPoints;
   const badgeInfo = getBadgeAndRank(totalScore, gameState.totalPossibleScore, gameState.icpStatus);
   
+  const handleRestart = () => {
+    onRestart();
+  };
+
   return (
     <div className="w-full relative">
       {/* Success confetti for excellent outcomes */}
@@ -254,7 +293,7 @@ export const GameOverScreen = ({
           <Button 
             variant="outline" 
             className="w-full glass mt-4 text-blue-300 border-blue-700 hover:bg-blue-900 hover:bg-opacity-50"
-            onClick={onRestart}
+            onClick={handleRestart}
           >
             <RotateCcw className="h-5 w-5 mr-2" />
             Restart Simulation

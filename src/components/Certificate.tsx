@@ -1,8 +1,42 @@
 // src/components/Certificate.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { GameState, BadgeInfo } from '../types';
+import { verifyForCertificate } from '../utils/auth';
 
-export const Certificate = ({ playerName, gameState, onClose, getBadgeAndRank }) => {
+interface CertificateProps {
+  playerName: string;
+  gameState: GameState;
+  onClose: () => void;
+  getBadgeAndRank: (score: number, totalPossible: number, icpStatus: string) => BadgeInfo;
+}
+
+export const Certificate: React.FC<CertificateProps> = ({ playerName, gameState, onClose, getBadgeAndRank }) => {
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [certificateId, setCertificateId] = useState("");
+
+  useEffect(() => {
+    // Generate unique certificate ID
+    setCertificateId(`ICP-${Date.now().toString(36)}`);
+    
+    // Verify certificate eligibility
+    const result = verifyForCertificate(playerName, gameState.score + gameState.bonusPoints);
+    setIsValid(result.valid);
+    setErrorMessage(result.message || "");
+  }, [playerName, gameState]);
+
+  if (!isValid) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full text-center">
+          <div className="text-red-600 mb-4">{errorMessage}</div>
+          <Button onClick={onClose}>Close</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
@@ -57,6 +91,10 @@ export const Certificate = ({ playerName, gameState, onClose, getBadgeAndRank })
                 <div className="font-bold">Dr. A. Neurologist</div>
                 <div className="text-xs">Head of Neuroscience Education</div>
               </div>
+            </div>
+            
+            <div className="text-xs text-gray-400 mt-2">
+              Certificate ID: {certificateId} • Issued: {new Date().toLocaleDateString()}
             </div>
           </div>
         </div>

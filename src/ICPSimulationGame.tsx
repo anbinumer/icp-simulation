@@ -1,8 +1,10 @@
 // src/ICPSimulationGame.tsx
+import './styles/accessibility.css';
 import React, { useState } from 'react';
 import { Brain, PhoneCall, Sparkles, Heart, Activity, AlertCircle } from 'lucide-react';
 import { scenarios } from './data/scenarios';
 import GameInterface from './components/GameInterface';
+import { saveGameState, loadGameState } from './utils/storage';
 import { GameOverScreen } from './components/GameOverScreen';
 import { Leaderboard } from './components/Leaderboard';
 import { Achievements } from './components/Achievements';
@@ -334,245 +336,253 @@ const ICPSimulationGame = () => {
   };
 
   return (
-    <div className="gaming-theme flex flex-col w-full max-w-6xl mx-auto p-4 space-y-4 min-h-screen">
-      <div className="header-card">
-        <Brain className="h-10 w-10 text-white" />
-        <h1 className="text-2xl font-bold">
-          ICP Management Simulation: Sarah Chen's Case
-        </h1>
-      </div>
+    <>
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
+      <div className="gaming-theme flex flex-col w-full max-w-6xl mx-auto p-4 space-y-4 min-h-screen">
+        <div className="header-card">
+          <Brain className="h-10 w-10 text-white" />
+          <h1 className="text-2xl font-bold">
+            ICP Management Simulation: Sarah Chen's Case
+          </h1>
+        </div>
 
-      <div className="card flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <PhoneCall className="h-5 w-5 text-blue-400" />
-          <span className="text-sm font-medium">Doctor Calls Remaining: {gameState.doctorCallsRemaining}</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium mr-2">Patient Status:</span>
-          <span className={`status-badge ${getStatusClass(gameState.icpStatus)}`}>
-            {gameState.icpStatus.charAt(0).toUpperCase() + gameState.icpStatus.slice(1)}
-          </span>
-        </div>
-      </div>
-      
-      {gameState.gameOver ? (
-        <GameOverScreen 
-          gameState={gameState}
-          playerName={playerName}
-          setPlayerName={setPlayerName}
-          onRestart={restartGame}
-          onShowLeaderboard={() => setShowLeaderboard(true)}
-          onShowAchievements={() => setShowAchievements(true)}
-          onShowCertificate={() => setShowCertificate(true)}
-          onShowShare={() => setShowShareModal(true)}
-          getBadgeAndRank={getBadgeAndRank}
-          formatTime={formatTime}
-        />
-      ) : (
-        <div className="game-interface-container flex flex-col md:flex-row gap-4">
-          <div className="main-game-area flex-1">
-            <div className="card">
-              <h2 className="text-xl font-semibold mb-2">
-                {currentScenario.title}
-              </h2>
-              <div className="mb-3">
-                <span className="text-sm text-blue-400">Scenario {gameState.currentScenarioIndex + 1} of {scenarios.length}</span>
-              </div>
-              
-              <div className="progress-indicator">
-                {scenarios.map((_, index) => (
-                  <div 
-                    key={index} 
-                    className={`progress-step ${index === gameState.currentScenarioIndex ? 'active' : index < gameState.currentScenarioIndex ? 'completed' : ''}`}
-                  />
-                ))}
-              </div>
-              
-              <div className="scenario-content my-4">
-                <p className="text-gray-200">{currentScenario.description}</p>
-              </div>
-              
-              <div className="card vital-monitor bg-slate-800">
-                <h3 className="text-lg font-medium mb-3 text-white flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-blue-400" />
-                  Patient Vitals Monitor
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="vital-item">
-                    <span className="vital-label">Heart Rate</span>
-                    <span className={`vital-value ${gameState.heartRate < 60 ? 'critical' : ''}`}>
-                      {gameState.heartRate} bpm
-                    </span>
-                  </div>
-                  <div className="vital-item">
-                    <span className="vital-label">Blood Pressure</span>
-                    <span className={`vital-value ${parseInt(gameState.bp.split('/')[0]) > 160 ? 'critical' : ''}`}>
-                      {gameState.bp}
-                    </span>
-                  </div>
-                  <div className="vital-item">
-                    <span className="vital-label">GCS Score</span>
-                    <span className={`vital-value ${gameState.gcsScore < 9 ? 'critical' : gameState.gcsScore < 13 ? 'warning' : ''}`}>
-                      {gameState.gcsScore}/15
-                    </span>
-                  </div>
-                  <div className="vital-item">
-                    <span className="vital-label">ICP Range</span>
-                    <span className={`vital-value ${gameState.icpStatus === 'critical' || gameState.icpStatus === 'herniation' ? 'critical' : gameState.icpStatus === 'elevated' ? 'warning' : ''}`}>
-                      {gameState.icpStatus === 'normal' ? '5-15 mmHg' : 
-                       gameState.icpStatus === 'elevated' ? '16-20 mmHg' : 
-                       gameState.icpStatus === 'critical' ? '21-30 mmHg' : '>40 mmHg'}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div className="vital-item">
-                    <span className="vital-label">Right Pupil</span>
-                    <span className="vital-value">{gameState.pupilRight}</span>
-                  </div>
-                  <div className="vital-item">
-                    <span className="vital-label">Left Pupil</span>
-                    <span className="vital-value">{gameState.pupilLeft}</span>
-                  </div>
-                </div>
-              </div>
-              
-              {!gameState.showFeedback && !gameState.showDoctorAdvice && (
-                <div className="decision-options mt-4">
-                  <h3 className="text-lg font-medium mb-3">What is your next action?</h3>
-                  {currentScenario.options.map((option, index) => (
-                    <button 
-                      key={index}
-                      className="decision-button"
-                      onClick={() => makeDecision(index)}
-                    >
-                      {option.text}
-                    </button>
-                  ))}
-                  
-                  <button className="call-doctor-button" onClick={callDoctor}>
-                    <PhoneCall className="h-4 w-4" />
-                    Call Doctor ({gameState.doctorCallsRemaining} calls left)
-                  </button>
-                </div>
-              )}
-              
-              {gameState.showDoctorAdvice && (
-                <div className="doctor-advice card mt-4 bg-blue-900">
-                  <h3 className="text-lg font-medium mb-2 flex items-center">
-                    <PhoneCall className="h-5 w-5 mr-2" />
-                    Doctor's Advice
-                  </h3>
-                  <p className="text-gray-200 mb-4">{gameState.doctorAdvice}</p>
-                  <button 
-                    className="call-doctor-button"
-                    onClick={continueGame}
-                  >
-                    Continue
-                  </button>
-                </div>
-              )}
-              
-              {gameState.showFeedback && gameState.lastDecision && (
-                <div className={`feedback card mt-4 ${
-                  gameState.lastDecision.decision.outcome === "Positive" ? "bg-green-900" : 
-                  gameState.lastDecision.decision.outcome === "Neutral" ? "bg-yellow-900" : "bg-red-900"
-                }`}>
-                  <h3 className="text-lg font-medium mb-2">Feedback</h3>
-                  <p className="text-gray-200 mb-4">{gameState.lastDecision.decision.feedback}</p>
-                  <button 
-                    className="call-doctor-button"
-                    onClick={continueGame}
-                  >
-                    Continue
-                  </button>
-                </div>
-              )}
+        <main id="main-content">
+          <div className="card flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <PhoneCall className="h-5 w-5 text-blue-400" />
+              <span className="text-sm font-medium">Doctor Calls Remaining: {gameState.doctorCallsRemaining}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium mr-2">Patient Status:</span>
+              <span className={`status-badge ${getStatusClass(gameState.icpStatus)}`}>
+                {gameState.icpStatus.charAt(0).toUpperCase() + gameState.icpStatus.slice(1)}
+              </span>
             </div>
           </div>
           
-          <div className="game-sidebar w-full md:w-80">
-            <div className="card">
-              <div className="score-display mb-4">
-                <h3 className="text-lg font-medium mb-2 flex items-center">
-                  <Sparkles className="h-5 w-5 mr-2 text-yellow-400" />
-                  Score
-                </h3>
-                <div className="text-3xl font-bold text-blue-400">{gameState.score}</div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <div>
-                    <span className="text-sm text-gray-400">Base</span>
-                    <div className="text-lg">{gameState.score - gameState.bonusPoints}</div>
+          {gameState.gameOver ? (
+            <GameOverScreen 
+              gameState={gameState}
+              playerName={playerName}
+              setPlayerName={setPlayerName}
+              onRestart={restartGame}
+              setGameState={setGameState}
+              onShowLeaderboard={() => setShowLeaderboard(true)}
+              onShowAchievements={() => setShowAchievements(true)}
+              onShowCertificate={() => setShowCertificate(true)}
+              onShowShare={() => setShowShareModal(true)}
+              getBadgeAndRank={getBadgeAndRank}
+              formatTime={formatTime}
+            />
+          ) : (
+            <div className="game-interface-container flex flex-col md:flex-row gap-4">
+              <div className="main-game-area flex-1">
+                <div className="card">
+                  <h2 className="text-xl font-semibold mb-2">
+                    {currentScenario.title}
+                  </h2>
+                  <div className="mb-3">
+                    <span className="text-sm text-blue-400">Scenario {gameState.currentScenarioIndex + 1} of {scenarios.length}</span>
                   </div>
-                  <div>
-                    <span className="text-sm text-gray-400">Bonus</span>
-                    <div className="text-lg">{gameState.bonusPoints}</div>
+                  
+                  <div className="progress-indicator">
+                    {scenarios.map((_, index) => (
+                      <div 
+                        key={index} 
+                        className={`progress-step ${index === gameState.currentScenarioIndex ? 'active' : index < gameState.currentScenarioIndex ? 'completed' : ''}`}
+                      />
+                    ))}
                   </div>
+                  
+                  <div className="scenario-content my-4">
+                    <p className="text-gray-200">{currentScenario.description}</p>
+                  </div>
+                  
+                  <div className="card vital-monitor bg-slate-800">
+                    <h3 className="text-lg font-medium mb-3 text-white flex items-center">
+                      <Activity className="h-5 w-5 mr-2 text-blue-400" />
+                      Patient Vitals Monitor
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="vital-item">
+                        <span className="vital-label">Heart Rate</span>
+                        <span className={`vital-value ${gameState.heartRate < 60 ? 'critical' : ''}`}>
+                          {gameState.heartRate} bpm
+                        </span>
+                      </div>
+                      <div className="vital-item">
+                        <span className="vital-label">Blood Pressure</span>
+                        <span className={`vital-value ${parseInt(gameState.bp.split('/')[0]) > 160 ? 'critical' : ''}`}>
+                          {gameState.bp}
+                        </span>
+                      </div>
+                      <div className="vital-item">
+                        <span className="vital-label">GCS Score</span>
+                        <span className={`vital-value ${gameState.gcsScore < 9 ? 'critical' : gameState.gcsScore < 13 ? 'warning' : ''}`}>
+                          {gameState.gcsScore}/15
+                        </span>
+                      </div>
+                      <div className="vital-item">
+                        <span className="vital-label">ICP Range</span>
+                        <span className={`vital-value ${gameState.icpStatus === 'critical' || gameState.icpStatus === 'herniation' ? 'critical' : gameState.icpStatus === 'elevated' ? 'warning' : ''}`}>
+                          {gameState.icpStatus === 'normal' ? '5-15 mmHg' : 
+                           gameState.icpStatus === 'elevated' ? '16-20 mmHg' : 
+                           gameState.icpStatus === 'critical' ? '21-30 mmHg' : '>40 mmHg'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div className="vital-item">
+                        <span className="vital-label">Right Pupil</span>
+                        <span className="vital-value">{gameState.pupilRight}</span>
+                      </div>
+                      <div className="vital-item">
+                        <span className="vital-label">Left Pupil</span>
+                        <span className="vital-value">{gameState.pupilLeft}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {!gameState.showFeedback && !gameState.showDoctorAdvice && (
+                    <div className="decision-options mt-4">
+                      <h3 className="text-lg font-medium mb-3">What is your next action?</h3>
+                      {currentScenario.options.map((option, index) => (
+                        <button 
+                          key={index}
+                          className="decision-button"
+                          onClick={() => makeDecision(index)}
+                        >
+                          {option.text}
+                        </button>
+                      ))}
+                      
+                      <button className="call-doctor-button" onClick={callDoctor}>
+                        <PhoneCall className="h-4 w-4" />
+                        Call Doctor ({gameState.doctorCallsRemaining} calls left)
+                      </button>
+                    </div>
+                  )}
+                  
+                  {gameState.showDoctorAdvice && (
+                    <div className="doctor-advice card mt-4 bg-blue-900">
+                      <h3 className="text-lg font-medium mb-2 flex items-center">
+                        <PhoneCall className="h-5 w-5 mr-2" />
+                        Doctor's Advice
+                      </h3>
+                      <p className="text-gray-200 mb-4">{gameState.doctorAdvice}</p>
+                      <button 
+                        className="call-doctor-button"
+                        onClick={continueGame}
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  )}
+                  
+                  {gameState.showFeedback && gameState.lastDecision && (
+                    <div className={`feedback card mt-4 ${
+                      gameState.lastDecision.decision.outcome === "Positive" ? "bg-green-900" : 
+                      gameState.lastDecision.decision.outcome === "Neutral" ? "bg-yellow-900" : "bg-red-900"
+                    }`}>
+                      <h3 className="text-lg font-medium mb-2">Feedback</h3>
+                      <p className="text-gray-200 mb-4">{gameState.lastDecision.decision.feedback}</p>
+                      <button 
+                        className="call-doctor-button"
+                        onClick={continueGame}
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <button
-                className="call-doctor-button mb-4 w-full justify-center"
-                onClick={() => setShowResources(!showResources)}
-              >
-                {showResources ? "Hide Clinical Resources" : "Show Clinical Resources"}
-              </button>
-              
-              {showResources && (
-                <div className="clinical-resources">
-                  <h3 className="text-xl font-medium mb-3">Clinical Resources</h3>
-                  
-                  <div className="resource-section">
-                    <h4 className="resource-title">ICP NORMAL RANGES</h4>
-                    <ul className="resource-list">
-                      <li>Normal: 5-15 mmHg</li>
-                      <li>Elevated: 16-20 mmHg</li>
-                      <li>Critical: 21-40 mmHg</li>
-                      <li>Severe: &gt;40 mmHg (high risk of herniation)</li>
-                    </ul>
+              <div className="game-sidebar w-full md:w-80">
+                <div className="card">
+                  <div className="score-display mb-4">
+                    <h3 className="text-lg font-medium mb-2 flex items-center">
+                      <Sparkles className="h-5 w-5 mr-2 text-yellow-400" />
+                      Score
+                    </h3>
+                    <div className="text-3xl font-bold text-blue-400">{gameState.score}</div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <div>
+                        <span className="text-sm text-gray-400">Base</span>
+                        <div className="text-lg">{gameState.score - gameState.bonusPoints}</div>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-400">Bonus</span>
+                        <div className="text-lg">{gameState.bonusPoints}</div>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="resource-section">
-                    <h4 className="resource-title">CUSHING'S TRIAD</h4>
-                    <ul className="resource-list">
-                      <li>Hypertension (↑ BP)</li>
-                      <li>Bradycardia (↓ HR)</li>
-                      <li>Irregular breathing pattern</li>
-                    </ul>
-                  </div>
+                  <button
+                    className="call-doctor-button mb-4 w-full justify-center"
+                    onClick={() => setShowResources(!showResources)}
+                  >
+                    {showResources ? "Hide Clinical Resources" : "Show Clinical Resources"}
+                  </button>
                   
-                  <div className="resource-section">
-                    <h4 className="resource-title">ICP MANAGEMENT</h4>
-                    <ul className="resource-list">
-                      <li>Elevate head of bed 30-45°</li>
-                      <li>Maintain neutral head/neck alignment</li>
-                      <li>Minimize noxious stimuli</li>
-                      <li>Osmotic therapy (mannitol, hypertonic saline)</li>
-                      <li>CSF drainage via EVD if placed</li>
-                      <li>Controlled hyperventilation (temporary)</li>
-                      <li>Surgical decompression (if medical management fails)</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="resource-section">
-                    <h4 className="resource-title">HERNIATION WARNING SIGNS</h4>
-                    <ul className="resource-list">
-                      <li>Unilateral or bilateral pupil dilation</li>
-                      <li>Loss of pupillary reflex</li>
-                      <li>Decorticate or decerebrate posturing</li>
-                      <li>Rapid decline in GCS</li>
-                    </ul>
-                  </div>
+                  {showResources && (
+                    <div className="clinical-resources">
+                      <h3 className="text-xl font-medium mb-3">Clinical Resources</h3>
+                      
+                      <div className="resource-section">
+                        <h4 className="resource-title">ICP NORMAL RANGES</h4>
+                        <ul className="resource-list">
+                          <li>Normal: 5-15 mmHg</li>
+                          <li>Elevated: 16-20 mmHg</li>
+                          <li>Critical: 21-40 mmHg</li>
+                          <li>Severe: &gt;40 mmHg (high risk of herniation)</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="resource-section">
+                        <h4 className="resource-title">CUSHING'S TRIAD</h4>
+                        <ul className="resource-list">
+                          <li>Hypertension (↑ BP)</li>
+                          <li>Bradycardia (↓ HR)</li>
+                          <li>Irregular breathing pattern</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="resource-section">
+                        <h4 className="resource-title">ICP MANAGEMENT</h4>
+                        <ul className="resource-list">
+                          <li>Elevate head of bed 30-45°</li>
+                          <li>Maintain neutral head/neck alignment</li>
+                          <li>Minimize noxious stimuli</li>
+                          <li>Osmotic therapy (mannitol, hypertonic saline)</li>
+                          <li>CSF drainage via EVD if placed</li>
+                          <li>Controlled hyperventilation (temporary)</li>
+                          <li>Surgical decompression (if medical management fails)</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="resource-section">
+                        <h4 className="resource-title">HERNIATION WARNING SIGNS</h4>
+                        <ul className="resource-list">
+                          <li>Unilateral or bilateral pupil dilation</li>
+                          <li>Loss of pupillary reflex</li>
+                          <li>Decorticate or decerebrate posturing</li>
+                          <li>Rapid decline in GCS</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
+          )}
+          
+          <div className="text-center text-sm text-blue-300 mt-6 card">
+            <p>This simulation contributes to your Continuing Professional Development in Neuroscience Nursing.</p>
           </div>
-        </div>
-      )}
-      
-      <div className="text-center text-sm text-blue-300 mt-6 card">
-        <p>This simulation contributes to your Continuing Professional Development in Neuroscience Nursing.</p>
+        </main>
       </div>
       
       {/* Modals */}
@@ -610,7 +620,7 @@ const ICPSimulationGame = () => {
           getBadgeAndRank={getBadgeAndRank}
         />
       )}
-    </div>
+    </>
   );
 };
 
